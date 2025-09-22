@@ -2,12 +2,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MinimalApi.Dominio.DTOs;
 using MinimalApi.Dominio.Servicos;
+using MinimalApi.Dominio.Interfaces;
+using MinimalApi.Infraestrutura.Db;
 
 var builder = WebApplication.CreateBuilder(args);
 
 IServiceCollection serviceCollection = builder.Services.AddScoped<IAdministradorServico, AdministradorServico>();
 
-builder.Services.AddDbContext<MinimalApi.Infraestrutura.DbContexto>(options =>
+builder.Services.AddDbContext<MinimalApi.Infraestrutura.Db.DbContexto>(options =>
 {
     options.UseMySql(builder.Configuration.GetConnectionString("MySQL"), ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("MySQL")));
 });
@@ -26,3 +28,5 @@ app.MapPost("/login", ([FromBody] LoginDTO loginDTO, IAdministradorServico admin
         return Results.Unauthorized();
 });
 app.Run();
+
+
