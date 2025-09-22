@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MinimalApi.Models.Entidades;
 
-namespace Infraestrutura.Data.Db;
+namespace MinimalApi.Infraestrutura.Data.Db;
 
 public class DbContexto : DbContext
 {
