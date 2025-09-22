@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MinimalApi.Models.Entidades
+namespace MinimalApi.Dominio.Entidades
 {
     public class Administrador
     {
