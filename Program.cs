@@ -25,7 +25,7 @@ var app = builder.Build();
 #endregion
 
 #region Home
-app.MapGet("/", () => Results.Json(new MinimalApi.Dominio.ModelViews.Home()));
+app.MapGet("/", () => Results.Json(new MinimalApi.Dominio.ModelViews.Home())).WithTags("Home");
 #endregion
 
 #region Administradores
@@ -37,8 +37,9 @@ app.MapPost("/Administradores/login", ([FromBody] LoginDTO loginDTO, IAdministra
     }
     else
         return Results.Unauthorized();
-});
+}).WithTags("Administradores");
 #endregion
+
 #region Veiculos
 app.MapPost("/Veiculos", ([FromBody] VeiculoDTO veiculoDTO, IVeiculosServico VeiculosServico) =>
 {
@@ -51,14 +52,15 @@ app.MapPost("/Veiculos", ([FromBody] VeiculoDTO veiculoDTO, IVeiculosServico Vei
     VeiculosServico.Adicionar(veiculo);
 
     return Results.Created($"/Veiculos/{veiculo.Id}", veiculo);
-});
+}).WithTags("Veiculos");
 app.MapGet("/Veiculos", ([FromQuery] int? pagina, string? nome, string? marca, IVeiculosServico VeiculosServico) =>
 {
     var veiculos = VeiculosServico.Todos(pagina, nome, marca);
     
     return Results.Ok(veiculos);
-});
+}).WithTags("Veiculos");
 #endregion
+
 #region App
 app.UseSwagger();
 app.UseSwaggerUI();
