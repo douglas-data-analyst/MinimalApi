@@ -39,7 +39,7 @@ public class VeiculosServico : IVeiculosServico
         _contexto.SaveChanges();
     }
 
-    public List<Veiculo> Todos(int pagina = 1, string? nome = null, string? marca = null) 
+    public List<Veiculo> Todos(int? pagina = 1, string? nome = null, string? marca = null) 
     {
         var query = _contexto.Veiculos.AsQueryable();
 
@@ -53,9 +53,12 @@ public class VeiculosServico : IVeiculosServico
             query = query.Where(v => v.Marca.ToLower().Contains(marca.ToLower())); 
         }
 
-        int pageSize = 10; 
-        int skip = (pagina - 1) * pageSize;
+        int itemporpagina = 10; 
 
-        return query.Skip(skip).Take(pageSize).ToList();
+        if(pagina != null)
+            query = query.Skip(((int)pagina - 1) * itemporpagina).Take(itemporpagina);
+
+        return query.ToList();
+        
     }
 }
