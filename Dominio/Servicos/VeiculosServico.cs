@@ -14,6 +14,11 @@ public class VeiculosServico : IVeiculosServico
         _contexto = contexto;
     }
 
+    public Veiculo? BuscaPorId(int id) 
+    {
+        return _contexto.Veiculos.Find(id);
+    }
+
     public Veiculo? Deletar(Veiculo veiculo) 
     {
         _contexto.Veiculos.Remove(veiculo);
@@ -26,11 +31,6 @@ public class VeiculosServico : IVeiculosServico
         _contexto.Veiculos.Update(veiculo);
         _contexto.SaveChanges();
         return veiculo;
-    }
-
-    public Veiculo? BuscaPorId(int id) 
-    {
-        return _contexto.Veiculos.Where(v => v.Id == id).FirstOrDefault(); 
     }
 
     public void Adicionar(Veiculo veiculo)
@@ -58,7 +58,6 @@ public class VeiculosServico : IVeiculosServico
         if(pagina != null)
             query = query.Skip(((int)pagina - 1) * itemporpagina).Take(itemporpagina);
 
-        return query.ToList();
-        
+        return query.ToList();   
     }
 }

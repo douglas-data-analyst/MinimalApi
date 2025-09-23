@@ -22,7 +22,7 @@ namespace MinimalApi.Dominio.Entidades
         public string Marca { get; set; } = default!;
 
         [Required]
-        [StringLength(10)]
+        [Range(1900, 2100, ErrorMessage = "Ano deve estar entre 1900 e 2100")]
         public int Ano { get; set; } = default!;
     }
 }

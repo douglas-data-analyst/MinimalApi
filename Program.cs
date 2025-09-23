@@ -6,6 +6,7 @@ using MinimalApi.Dominio.Interfaces;
 using MinimalApi.Infraestrutura.Db;
 using MinimalApi.Dominio.Entidades;
 using MinimalApi.Dominio.ModelViews;
+using MinimalApi.Dominio.Enuns;
 
 #region Builder
 var builder = WebApplication.CreateBuilder(args);
@@ -30,14 +31,102 @@ app.MapGet("/", () => Results.Json(new MinimalApi.Dominio.ModelViews.Home())).Wi
 #endregion
 
 #region Administradores
-app.MapPost("/Administradores/login", ([FromBody] LoginDTO loginDTO, IAdministradorServico administradorServico) =>
+// LOGIN
+app.MapPost("/administradores/login", ([FromBody] LoginDTO loginDTO, IAdministradorServico administradorServico) =>
 {
-    if (administradorServico.Login(loginDTO) != null)
+    var administrador = administradorServico.Login(loginDTO);
+    if (administrador != null)
     {
-        return Results.Ok("Login com Secesso");
+        return Results.Ok(new { message = "Login com Sucesso", administrador });
     }
-    else
-        return Results.Unauthorized();
+    return Results.Unauthorized();
+}).WithTags("Administradores");
+
+// CRIAR
+app.MapPost("/administradores", ([FromBody] AdministradorDTO administradorDTO, IAdministradorServico administradorServico) =>
+{
+    var validacao = new ErrosDeValidacao { Mensagens = new List<string>() };
+
+    if (string.IsNullOrEmpty(administradorDTO.Email))
+        validacao.Mensagens.Add("E-mail obrigatório");
+    if (string.IsNullOrEmpty(administradorDTO.Senha) || administradorDTO.Senha.Length < 6)
+        validacao.Mensagens.Add("Senha deve ter 6+ caracteres");
+    if (administradorDTO.Perfil == null)
+        validacao.Mensagens.Add("Perfil obrigatório");
+
+    if (validacao.Mensagens.Count > 0)
+        return Results.BadRequest(validacao);
+
+    var administrador = new Administrador
+    {
+        Email = administradorDTO.Email,
+        Senha = administradorDTO.Senha,
+        Perfil = administradorDTO.Perfil.Value  
+    };
+
+    administradorServico.Adicionar(administrador);
+    return Results.Created($"/administradores/{administrador.Id}", administrador);
+}).WithTags("Administradores");
+
+// LISTAR
+app.MapGet("/administradores", ([FromQuery] int? pagina, IAdministradorServico administradorServico) =>
+{
+    var administradores = administradorServico.Todos(pagina);
+    
+    var administradoresModelView = administradores.Select(adm => new AdministradorModelView
+    {
+        Id = adm.Id,
+        Email = adm.Email,
+        Perfil = adm.Perfil
+    }).ToList();
+
+    return Results.Ok(administradoresModelView);
+}).WithTags("Administradores");
+
+// BUSCAR POR ID
+app.MapGet("/administradores/{id}", ([FromRoute] int id, IAdministradorServico administradorServico) =>
+{
+    var administrador = administradorServico.BuscarPorId(id);
+    if (administrador == null)
+        return Results.NotFound();
+
+    var administradorModelView = new AdministradorModelView
+    {
+        Id = administrador.Id,
+        Email = administrador.Email,
+        Perfil = administrador.Perfil
+    };
+
+    return Results.Ok(administradorModelView);
+}).WithTags("Administradores");
+
+// ATUALIZAR
+app.MapPut("/administradores/{id}", ([FromRoute] int id, [FromBody] AdministradorDTO administradorDTO, IAdministradorServico administradorServico) =>
+{
+    var administrador = administradorServico.BuscarPorId(id);
+    if (administrador == null) 
+        return Results.NotFound();
+
+    administrador.Email = administradorDTO.Email;
+    administrador.Senha = administradorDTO.Senha;
+    
+    if (administradorDTO.Perfil.HasValue)
+        administrador.Perfil = administradorDTO.Perfil.Value;
+
+    administradorServico.Atualizar(administrador);
+    
+    return Results.Ok(administrador);
+}).WithTags("Administradores");
+
+// DELETAR
+app.MapDelete("/administradores/{id}", ([FromRoute] int id, IAdministradorServico administradorServico) =>
+{
+    var administrador = administradorServico.BuscarPorId(id);
+    if (administrador == null) 
+        return Results.NotFound();
+
+    administradorServico.Deletar(administrador);
+    return Results.NoContent();
 }).WithTags("Administradores");
 #endregion
 
