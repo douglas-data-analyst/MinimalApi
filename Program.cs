@@ -4,11 +4,13 @@ using MinimalApi.Dominio.DTOs;
 using MinimalApi.Dominio.Servicos;
 using MinimalApi.Dominio.Interfaces;
 using MinimalApi.Infraestrutura.Db;
+using MinimalApi.Dominio.Entidades;
 
 #region Builder
 var builder = WebApplication.CreateBuilder(args);
 
 IServiceCollection serviceCollection = builder.Services.AddScoped<IAdministradorServico, AdministradorServico>();
+
 builder.Services.AddScoped<IVeiculosServico, VeiculosServico>();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -38,7 +40,18 @@ app.MapPost("/Administradores/login", ([FromBody] LoginDTO loginDTO, IAdministra
 });
 #endregion
 #region Veiculos
+app.MapPost("/Veiculos", ([FromBody] VeiculoDTO veiculoDTO, IVeiculosServico VeiculosServico) =>
+{
+    var veiculo = new Veiculo
+    {
+        Nome = veiculoDTO.Nome,
+        Marca = veiculoDTO.Marca,
+        Ano = veiculoDTO.Ano
+    };
+    VeiculosServico.Adicionar(veiculo);
 
+    return Results.Created($"/Veiculos/{veiculo.Id}", veiculo);
+});
 #endregion
 #region App
 app.UseSwagger();
