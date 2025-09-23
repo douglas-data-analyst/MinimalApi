@@ -20,7 +20,7 @@ builder.Services.AddDbContext<MinimalApi.Infraestrutura.Db.DbContexto>(options =
 
 var app = builder.Build();
 
-app.MapGet("/", () => "Olá, Mundo!");
+app.MapGet("/", () => Results.Json(new MinimalApi.Dominio.ModelViews.Home()));
 
 app.MapPost("/login", ([FromBody] LoginDTO loginDTO, IAdministradorServico administradorServico) =>
 {
