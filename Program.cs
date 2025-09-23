@@ -5,6 +5,7 @@ using MinimalApi.Dominio.Servicos;
 using MinimalApi.Dominio.Interfaces;
 using MinimalApi.Infraestrutura.Db;
 using MinimalApi.Dominio.Entidades;
+using MinimalApi.Dominio.ModelViews;
 
 #region Builder
 var builder = WebApplication.CreateBuilder(args);
@@ -41,8 +42,27 @@ app.MapPost("/Administradores/login", ([FromBody] LoginDTO loginDTO, IAdministra
 #endregion
 
 #region Veiculos
+ErrosDeValidacao validaDTO(VeiculoDTO veiculoDTO)
+{
+    var validacao = new ErrosDeValidacao();
+    validacao.Mensagens = new List<string>();
+
+    if (string.IsNullOrEmpty(veiculoDTO.Nome))
+        validacao.Mensagens.Add("O nome do veiculo é obrigatório");
+    if (string.IsNullOrEmpty(veiculoDTO.Marca))
+        validacao.Mensagens.Add("A marca do veiculo é obrigatória");
+    if (veiculoDTO.Ano < 1900 || veiculoDTO.Ano > DateTime.Now.Year)
+        validacao.Mensagens.Add("O ano do veiculo é inválido");
+
+    return validacao;
+}
 app.MapPost("/Veiculos", ([FromBody] VeiculoDTO veiculoDTO, IVeiculosServico VeiculosServico) =>
 {
+    var validacao = validaDTO(veiculoDTO);
+
+    if (validacao.Mensagens.Count > 0)
+        return Results.BadRequest(validacao);
+
     var veiculo = new Veiculo
     {
         Nome = veiculoDTO.Nome,
@@ -75,6 +95,11 @@ app.MapPut("/Veiculo/{id}", ([FromRoute] int id, VeiculoDTO veiculoDTO, IVeiculo
     var veiculo = VeiculosServico.BuscaPorId(id);
     if (veiculo == null)
         return Results.NotFound();
+
+    var validacao = validaDTO(veiculoDTO);
+
+    if (validacao.Mensagens.Count > 0)
+        return Results.BadRequest(validacao);
 
     veiculo.Nome = veiculoDTO.Nome;
     veiculo.Marca = veiculoDTO.Marca;
