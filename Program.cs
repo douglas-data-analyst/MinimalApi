@@ -8,6 +8,10 @@ using MinimalApi.Infraestrutura.Db;
 var builder = WebApplication.CreateBuilder(args);
 
 IServiceCollection serviceCollection = builder.Services.AddScoped<IAdministradorServico, AdministradorServico>();
+builder.Services.AddScoped<IVeiculosServico, VeiculosServico>();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<MinimalApi.Infraestrutura.Db.DbContexto>(options =>
 {
@@ -27,6 +31,10 @@ app.MapPost("/login", ([FromBody] LoginDTO loginDTO, IAdministradorServico admin
     else
         return Results.Unauthorized();
 });
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
 app.Run();
 
 

@@ -13,7 +13,7 @@ public class AdministradorServico : IAdministradorServico
         _contexto = contexto;
     }
 
-    public Administrador? Login(LoginDTO loginDTO)
+    public Administrador Login(LoginDTO loginDTO)
     {
         var adm = _contexto.Administradores.Where(a => a.Email == loginDTO.Email && a.Senha == loginDTO.Senha).FirstOrDefault();
         return adm;
