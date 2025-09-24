@@ -23,4 +23,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="9.0.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="MinimalApi.csproj" />
+  </ItemGroup>
+
 </Project>
